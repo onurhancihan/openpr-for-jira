@@ -2,11 +2,9 @@ package org.openpr.jira;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Objects;
 
@@ -32,8 +30,15 @@ public final class GitHubApiClient {
      * The calling layer MUST enforce Jira and GitHub authorization.
      */
     public String listPullRequests(String baseUrl, String owner, String repository,
-                                   String token, int page) throws IOException, InterruptedException {
+                                   String token, int page, String approvedHost) throws IOException, InterruptedException {
+        if (approvedHost == null || !approvedHost.matches("(?i)[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?")) {
+            throw new IllegalArgumentException("Approved GitHub hostname is required");
+        }
         URI uri = endpoint(baseUrl, owner, repository, page);
+        String expectedApiHost = approvedHost.equalsIgnoreCase("github.com") ? "api.github.com" : approvedHost;
+        if (!uri.getHost().equalsIgnoreCase(expectedApiHost)) {
+            throw new IllegalArgumentException("GitHub hostname is not approved");
+        }
         if (token == null || token.isBlank() || token.indexOf('\r') >= 0 || token.indexOf('\n') >= 0) {
             throw new IllegalArgumentException("An approved GitHub token is required");
         }
