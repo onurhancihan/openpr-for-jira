@@ -28,7 +28,8 @@ public final class OpenPrIssueContextProvider implements ContextProvider {
         result.put("openprRows", List.of());
         result.put("openprStatus", "Not configured");
         Object candidate = context.get("issue");
-        if (!(candidate instanceof Issue issue)) return result;
+        if (!(candidate instanceof Issue)) return result;
+        Issue issue = (Issue) candidate;
         ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
         boolean allowed = user != null && ComponentAccessor.getPermissionManager()
                 .hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user);
