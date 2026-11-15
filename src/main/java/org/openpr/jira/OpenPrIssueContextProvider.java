@@ -33,26 +33,13 @@ public final class OpenPrIssueContextProvider implements ContextProvider {
         ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
         boolean allowed = user != null && ComponentAccessor.getPermissionManager()
                 .hasPermission(ProjectPermissions.BROWSE_PROJECTS, issue, user);
-        boolean enabled = "true".equalsIgnoreCase(System.getenv("OPENPR_ENABLED"));
-        String origin = System.getenv("OPENPR_GITHUB_ORIGIN");
-        String host = System.getenv("OPENPR_GITHUB_HOST");
-        String token = System.getenv("OPENPR_GITHUB_TOKEN");
-        String repoNames = System.getenv("OPENPR_REPOSITORIES");
-        if (!allowed || !enabled || origin == null || host == null || token == null || repoNames == null) {
-            return result;
-        }
+        if (!allowed) return result;
         try {
-            List<PullRequestLookup.Repository> repos = new ArrayList<>();
-            for (String entry : repoNames.split(",")) {
-                String[] parts = entry.trim().split("/", -1);
-                if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
-                    throw new IllegalArgumentException("Invalid repository configuration");
-                }
-                repos.add(new PullRequestLookup.Repository(parts[0], parts[1]));
-            }
+            OpenPrConfiguration config = OpenPrConfiguration.from(System.getenv());
+            if (!config.enabled()) return result;
             PullRequestLookup lookup = new PullRequestLookup(new GitHubApiClient()::listPullRequests);
             List<Map<String, String>> rows = new ArrayList<>();
-            for (GitHubPr pr : lookup.find(origin, host, token, repos, issue.getKey(), allowed, enabled)) {
+            for (GitHubPr pr : lookup.find(config.origin(), config.host(), config.token(), config.repositories(), issue.getKey(), allowed, config.enabled())) {
                 Map<String, String> row = new HashMap<>();
                 row.put("title", escape(pr.title()));
                 row.put("url", escape(pr.url()));
