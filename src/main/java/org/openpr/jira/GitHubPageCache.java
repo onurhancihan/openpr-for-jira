@@ -18,7 +18,7 @@ public final class GitHubPageCache implements PullRequestLookup.PageFetcher {
     private final PullRequestLookup.PageFetcher delegate;
     private final Clock clock;
     private final Map<String, Entry> entries = new LinkedHashMap<>(16, 0.75f, true);
-    private final Map<String, Object> inFlight = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Object fetchLock = new Object();
     private record Entry(String json, long expiresAt) {}
 
     public GitHubPageCache(PullRequestLookup.PageFetcher delegate) {
@@ -36,8 +36,7 @@ public final class GitHubPageCache implements PullRequestLookup.PageFetcher {
         // The digest is never logged or exposed to users.
         String key = origin + "|" + approvedHost + "|" + owner + "|" + repository + "|" + page
                 + "|" + tokenDigest(token);
-        Object lock = inFlight.computeIfAbsent(key, ignored -> new Object());
-        synchronized (lock) {
+        synchronized (fetchLock) {
             synchronized (entries) {
                 Entry cached = entries.get(key);
                 if (cached != null && cached.expiresAt > clock.millis()) return cached.json;
