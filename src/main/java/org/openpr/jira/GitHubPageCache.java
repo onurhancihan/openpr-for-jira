@@ -8,8 +8,8 @@ import java.util.Objects;
 
 /**
  * Short-lived in-memory cache for GitHub PR pages. No tokens are retained in
- * cache keys or values. Callers must use a stable, secret-free connection ID
- * that changes whenever the connection credentials/configuration change.
+ * cache keys or values. Cache keys include a SHA-256 token digest so credential
+ * changes invalidate old cache entries; entries still contain PR metadata.
  * Cache is per JVM; Jira Data Center nodes do not share entries.
  */
 public final class GitHubPageCache implements PullRequestLookup.PageFetcher {
