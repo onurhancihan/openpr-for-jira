@@ -45,7 +45,7 @@ public final class PullRequestLookup {
             for (int page = 1; page <= MAX_PAGES_PER_REPOSITORY; page++) {
                 String json = fetcher.fetch(origin, repo.owner(), repo.name(), token, page, approvedHost);
                 for (GitHubPr pr : GitHubPrParser.matching(json, issueKey)) {
-                    if (SafePullRequestUrl.isSafe(pr.url(), approvedHost)) {
+                    if (SafePullRequestUrl.isAllowed(pr.url(), approvedHost)) {
                         unique.putIfAbsent(repo.owner() + "/" + repo.name() + "#" + pr.number(), pr);
                     }
                 }
