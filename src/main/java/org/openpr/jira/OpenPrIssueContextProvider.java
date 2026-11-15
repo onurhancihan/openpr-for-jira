@@ -52,6 +52,9 @@ public final class OpenPrIssueContextProvider implements ContextProvider {
             }
             result.put("openprRows", rows);
             result.put("openprStatus", rows.isEmpty() ? "No matching pull requests" : "");
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            result.put("openprStatus", "Pull requests temporarily unavailable");
         } catch (Exception ex) {
             // Do not disclose configuration, tokens, response bodies, or internal hostnames.
             result.put("openprStatus", "Pull requests temporarily unavailable");
