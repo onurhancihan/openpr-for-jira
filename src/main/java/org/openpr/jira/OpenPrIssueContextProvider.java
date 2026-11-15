@@ -21,6 +21,7 @@ import java.util.Map;
  * This is not a replacement for a secure Jira administrator configuration screen.
  */
 public final class OpenPrIssueContextProvider implements ContextProvider {
+    private static final GitHubPageCache PAGE_CACHE = new GitHubPageCache(new GitHubApiClient()::listPullRequests);
     @Override public void init(Map<String, String> params) throws PluginParseException {}
 
     @Override public Map<String, Object> getContextMap(Map<String, Object> context) {
@@ -37,7 +38,7 @@ public final class OpenPrIssueContextProvider implements ContextProvider {
         try {
             OpenPrConfiguration config = OpenPrConfiguration.from(System.getenv());
             if (!config.enabled()) return result;
-            PullRequestLookup lookup = new PullRequestLookup(new GitHubApiClient()::listPullRequests);
+            PullRequestLookup lookup = new PullRequestLookup(PAGE_CACHE);
             List<Map<String, String>> rows = new ArrayList<>();
             for (GitHubPr pr : lookup.find(config.origin(), config.host(), config.token(), config.repositories(), issue.getKey(), allowed, config.enabled())) {
                 Map<String, String> row = new HashMap<>();
