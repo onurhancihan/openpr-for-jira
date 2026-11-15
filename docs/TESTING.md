@@ -14,3 +14,9 @@ Run `mvn test` with a compatible JDK and Maven installation. The GitHub Actions 
 - Security review and administrator approval.
 
 No corporate information, credentials or private repositories are needed for these initial tests.
+
+## Dependency-free security smoke tests
+
+Run `bash scripts/test_core.sh` with JDK 17+ (no Maven, Jira instance or GitHub token required). The `core-smoke.yml` workflow runs the same checks on GitHub Actions. Tests cover issue-key matching, opt-in visibility policy and approved PR link hosts.
+
+This does not prove Jira plugin installation or GitHub Enterprise integration. The Jira panel currently displays a static placeholder; administrator configuration and Jira issue-level authorization have not been wired up.
