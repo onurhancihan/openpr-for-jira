@@ -2,6 +2,8 @@ name: Build installable plugin candidate
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 permissions:
