@@ -1,0 +1,15 @@
+name: Validate source
+on:
+  push:
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify required files
+        run: |
+          test -f LICENSE
+          test -f README.md
+          test -f pom.xml
+          test -f src/main/resources/atlassian-plugin.xml
