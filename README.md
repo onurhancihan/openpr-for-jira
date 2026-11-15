@@ -2,7 +2,7 @@
 
 Open-source, read-only GitHub pull request viewer for Jira Data Center.
 
-> Status: early scaffold. Not yet a working or tested Jira plugin.
+> Status: experimental build candidate. Maven CI passes as reported; Jira Data Center installation and runtime behavior remain unverified.
 
 ## Goals
 
@@ -34,10 +34,10 @@ Open **Actions → Build installable plugin candidate → Run workflow** to atte
 
 ## Known blockers to a production release
 
-- Jira issue-level authorization and the administrator opt-in are not wired into the web panel.
+- Jira issue browse permission and environment-variable opt-in are wired into the panel, but real Jira issue-security behavior has not been integration-tested.
 - Secure GitHub credentials and administrator configuration are not implemented.
-- The current issue panel is a static placeholder, not a PR listing.
-- The GitHub API transport is not integrated with the Jira panel.
+- The panel now attempts to render matching PR metadata; runtime behavior remains unverified.
+- GitHub API transport is integrated with a per-node, 60-second bounded cache; full SSRF and operational hardening remain incomplete.
 - Build success and installation on a licensed Jira Data Center test instance are unverified.
 - The current Apache license file is a short notice, not the complete official license text; it must be corrected before a release.
 
