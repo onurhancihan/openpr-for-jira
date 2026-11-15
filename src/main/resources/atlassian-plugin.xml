@@ -6,6 +6,7 @@
   </plugin-info>
   <web-panel key="openpr-issue-panel" name="OpenPR Pull Requests" location="atl.jira.view.issue.right.context" weight="200">
     <description>Read-only OpenPR panel for Jira issue view.</description>
+    <context-provider class="org.openpr.jira.OpenPrIssueContextProvider"/>
     <resource name="view" type="velocity" location="/templates/pr-panel.vm"/>
   </web-panel>
 </atlassian-plugin>
