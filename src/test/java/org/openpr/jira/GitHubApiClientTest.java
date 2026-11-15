@@ -19,6 +19,14 @@ public class GitHubApiClientTest {
             catch (IllegalArgumentException expected) { /* expected */ }
         }
     }
+    @Test public void rejectsUnapprovedHostBeforeNetworkCall() throws Exception {
+        try {
+            new GitHubApiClient().listPullRequests("https://attacker.example", "team", "repo", "fake-token", 1, "github.example.org");
+            fail("Unapproved host must not be contacted");
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("not approved"));
+        }
+    }
     @Test public void blocksPathInjectionAndUnboundedPagination() {
         try { GitHubApiClient.endpoint("https://github.com", "../secrets", "repo", 1); fail(); }
         catch (IllegalArgumentException expected) { /* expected */ }
