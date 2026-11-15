@@ -31,7 +31,7 @@ public final class GitHubApiClient {
      */
     public String listPullRequests(String baseUrl, String owner, String repository,
                                    String token, int page, String approvedHost) throws IOException, InterruptedException {
-        if (approvedHost == null || !approvedHost.matches("(?i)[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?")) {
+        if (!isTrustedHostname(approvedHost)) {
             throw new IllegalArgumentException("Approved GitHub hostname is required");
         }
         URI uri = endpoint(baseUrl, owner, repository, page);
@@ -70,10 +70,27 @@ public final class GitHubApiClient {
             throw new IllegalArgumentException("Expected an HTTPS GitHub origin");
         }
         String host = origin.getHost();
+        if (!isTrustedHostname(host)) throw new IllegalArgumentException("Untrusted GitHub hostname");
         String apiHost = host.equalsIgnoreCase("github.com") ? "api.github.com" : host;
         String prefix = host.equalsIgnoreCase("github.com") ? "" : "/api/v3";
         return URI.create("https://" + apiHost + prefix + "/repos/" + owner + "/" + repository
                 + "/pulls?state=all&per_page=100&page=" + page);
+    }
+
+    /**
+     * Defense in depth: disallow loopback, local DNS names, literal IPs and
+     * obvious internal targets. Administrators must additionally enforce
+     * outbound network allowlisting and DNS rebinding protection.
+     */
+    static boolean isTrustedHostname(String host) {
+        if (host == null || host.isBlank() || host.length() > 253
+                || !host.matches("(?i)[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?")) return false;
+        String lower = host.toLowerCase(java.util.Locale.ROOT);
+        if (lower.equals("localhost") || lower.endsWith(".localhost")
+                || lower.endsWith(".local") || lower.endsWith(".internal")
+                || lower.endsWith(".test") || lower.endsWith(".invalid")) return false;
+        if (lower.matches("[0-9.]+") || lower.contains("..") || !lower.contains(".")) return false;
+        return true;
     }
 
     private static boolean validSlug(String slug) {
