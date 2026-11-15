@@ -10,7 +10,7 @@ Open-source, read-only GitHub pull request viewer for Jira Data Center.
 - Support GitHub Enterprise Server and GitHub.com
 - Show PR status, reviews and checks
 - Never expose credentials to the browser
-- Respect repository access permissions
+- Allow Jira issue viewers to see PR metadata only after administrator opt-in, even if they cannot open the PR in GitHub; GitHub still enforces access when clicked
 - No external hosting or database requirement
 
 ## Development
@@ -26,3 +26,19 @@ See [security notes](docs/SECURITY.md). Never commit tokens or private keys.
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE).
+
+
+## Build candidate (not a release)
+
+Open **Actions → Build installable plugin candidate → Run workflow** to attempt a Maven build with Java 21. A successful workflow uploads a temporary JAR artifact. This is not evidence of working Jira installation.
+
+## Known blockers to a production release
+
+- Jira issue-level authorization and the administrator opt-in are not wired into the web panel.
+- Secure GitHub credentials and administrator configuration are not implemented.
+- The current issue panel is a static placeholder, not a PR listing.
+- The GitHub API transport is not integrated with the Jira panel.
+- Build success and installation on a licensed Jira Data Center test instance are unverified.
+- The current Apache license file is a short notice, not the complete official license text; it must be corrected before a release.
+
+Do not install this development scaffold on a production Jira instance.
