@@ -28,6 +28,7 @@ public final class OpenPrIssueContextProvider implements ContextProvider {
         Map<String, Object> result = new HashMap<>();
         result.put("openprRows", List.of());
         result.put("openprStatus", "Not configured");
+        result.put("openprVisible", false);
         Object candidate = context.get("issue");
         if (!(candidate instanceof Issue)) return result;
         Issue issue = (Issue) candidate;
@@ -38,6 +39,7 @@ public final class OpenPrIssueContextProvider implements ContextProvider {
         try {
             OpenPrConfiguration config = OpenPrConfiguration.from(System.getenv());
             if (!config.enabled()) return result;
+            result.put("openprVisible", true);
             PullRequestLookup lookup = new PullRequestLookup(PAGE_CACHE);
             List<Map<String, String>> rows = new ArrayList<>();
             for (GitHubPr pr : lookup.find(config.origin(), config.host(), config.token(), config.repositories(), issue.getKey(), allowed, config.enabled())) {
