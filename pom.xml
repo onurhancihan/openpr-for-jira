@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.openpr.jira</groupId>
+  <artifactId>openpr-for-jira</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>atlassian-plugin</packaging>
+  <name>OpenPR for Jira</name>
+  <description>Read-only GitHub PR viewer for Jira Data Center (scaffold)</description>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jira.version>11.3.0</jira.version>
+    <amps.version>9.5.2</amps.version>
+  </properties>
+  <repositories>
+    <repository><id>atlassian-public</id><url>https://packages.atlassian.com/maven/repository/public</url></repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository><id>atlassian-public</id><url>https://packages.atlassian.com/maven/repository/public</url></pluginRepository>
+  </pluginRepositories>
+  <build><plugins><plugin>
+    <groupId>com.atlassian.maven.plugins</groupId><artifactId>jira-maven-plugin</artifactId><version>${amps.version}</version><extensions>true</extensions>
+    <configuration><productVersion>${jira.version}</productVersion><productDataVersion>${jira.version}</productDataVersion></configuration>
+  </plugin></plugins></build>
+</project>
