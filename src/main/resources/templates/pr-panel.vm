@@ -1,3 +1,4 @@
+#if($openprVisible)
 <section class="module openpr-issue-panel" aria-label="OpenPR pull requests">
   <div class="mod-header"><h3>GitHub Pull Requests</h3></div>
   <div class="mod-content">
@@ -14,3 +15,4 @@
     #end
   </div>
 </section>
+#end
