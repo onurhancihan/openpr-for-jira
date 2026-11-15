@@ -18,6 +18,7 @@ public final class GitHubPageCache implements PullRequestLookup.PageFetcher {
     private final PullRequestLookup.PageFetcher delegate;
     private final Clock clock;
     private final Map<String, Entry> entries = new LinkedHashMap<>(16, 0.75f, true);
+    private final Map<String, Object> inFlight = new java.util.concurrent.ConcurrentHashMap<>();
     private record Entry(String json, long expiresAt) {}
 
     public GitHubPageCache(PullRequestLookup.PageFetcher delegate) {
@@ -35,17 +36,20 @@ public final class GitHubPageCache implements PullRequestLookup.PageFetcher {
         // The digest is never logged or exposed to users.
         String key = origin + "|" + approvedHost + "|" + owner + "|" + repository + "|" + page
                 + "|" + tokenDigest(token);
-        synchronized (entries) {
-            Entry cached = entries.get(key);
-            if (cached != null && cached.expiresAt > clock.millis()) return cached.json;
-            entries.remove(key);
+        Object lock = inFlight.computeIfAbsent(key, ignored -> new Object());
+        synchronized (lock) {
+            synchronized (entries) {
+                Entry cached = entries.get(key);
+                if (cached != null && cached.expiresAt > clock.millis()) return cached.json;
+                entries.remove(key);
+            }
+            String json = delegate.fetch(origin, owner, repository, token, page, approvedHost);
+            synchronized (entries) {
+                entries.put(key, new Entry(json, clock.millis() + TTL_MILLIS));
+                while (entries.size() > MAX_ENTRIES) entries.remove(entries.keySet().iterator().next());
+            }
+            return json;
         }
-        String json = delegate.fetch(origin, owner, repository, token, page, approvedHost);
-        synchronized (entries) {
-            entries.put(key, new Entry(json, clock.millis() + TTL_MILLIS));
-            while (entries.size() > MAX_ENTRIES) entries.remove(entries.keySet().iterator().next());
-        }
-        return json;
     }
 
     private static String tokenDigest(String token) {
