@@ -1,7 +1,16 @@
 <section class="module openpr-issue-panel" aria-label="OpenPR pull requests">
   <div class="mod-header"><h3>GitHub Pull Requests</h3></div>
   <div class="mod-content">
-    <p>OpenPR is installed. GitHub integration is not configured yet.</p>
-    <p class="description">No repository information or credentials are accessed by this preview.</p>
+    #if($openprRows && !$openprRows.isEmpty())
+      <ul class="item-details">
+      #foreach($pr in $openprRows)
+        <li><a href="$pr.url" target="_blank" rel="noopener noreferrer">#$pr.number $pr.title</a>
+          <span class="description">$pr.state &middot; $pr.author &middot; $pr.branch</span>
+        </li>
+      #end
+      </ul>
+    #else
+      <p class="description">$openprStatus</p>
+    #end
   </div>
 </section>
